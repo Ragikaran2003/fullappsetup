@@ -33,7 +33,7 @@ function OnlineStudents() {
 
   const handleLogoutUser = async (userId) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/users/logout/${userId}`
       );
@@ -66,7 +66,7 @@ function OnlineStudents() {
       if (!adminCenter) return;
       try {
         setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         const data = await fetchUsersByCenter(adminCenter);
 
         // Filter users by the selected date
@@ -230,7 +230,7 @@ function OnlineStudents() {
             ) : users.length > 0 ? (
               users.map((student) => (
                 <tr
-                  key={student.studentid}
+                  key={student._id}
                   className="border-b hover:bg-gray-700 cursor-pointer"
                 >
                   <td className="p-4 text-sm">{student.studentId}</td>

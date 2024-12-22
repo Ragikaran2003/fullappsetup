@@ -55,7 +55,7 @@ function AllUsers() {
       if (!adminCenter) return;
       try {
         // Simulate a delay for fetching data
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
   
         const data = await fetchStudentData(adminCenter);
   
@@ -385,7 +385,7 @@ function AllUsers() {
             ) : studentsData.length > 0 ? (
               currentUsers.map((user) => (
                 <tr
-                  key={user.id}
+                  key={user._id}
                   className="border-b hover:bg-gray-700 cursor-pointer"
                 >
                   <td className="p-4 text-sm">{user.studentId}</td>

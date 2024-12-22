@@ -65,6 +65,30 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Route to update student classes
+router.put('/update-classes/:id', async (req, res) => {
+  const { id } = req.params;
+  const { classes } = req.body;
+
+  try {
+    // Find the student by ID and update the classes field
+    const updatedStudent = await Student.findByIdAndUpdate(
+      id,
+      { classes }, // Update the classes field
+      { new: true } // Return the updated student
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
+    res.status(200).json(updatedStudent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
@@ -143,6 +167,34 @@ router.get("/details/:id", async (req, res) => {
   } catch (err) {
     console.error("Error fetching student details:", err);
     res.status(500).json({ error: "An unexpected error occurred" });
+  }
+});
+
+
+router.get("/univercity", async (req, res) => {
+  try {
+    // Fetch students whose project is "University of Moratuwa"
+    const students = await Student.find({ project: "University of Moratuwa" });
+
+    // Remove duplicates by fullName and select only the necessary fields
+    const uniqueStudents = Array.from(
+      new Map(
+        students.map((student) => [student.fullName, student])
+      ).values()
+    );
+
+    // Prepare the response with only fullName, certificates, and center
+    const filteredStudents = uniqueStudents.map((student) => ({
+      fullName: student.fullName,
+      certificates: student.certificates,
+      center: student.center,
+    }));
+
+    // Send the response
+    return res.status(200).json({ students: filteredStudents });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
 

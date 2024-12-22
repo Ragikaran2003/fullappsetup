@@ -11,10 +11,10 @@ import {
   Legend,
 } from "chart.js";
 import { FaSignOutAlt } from "react-icons/fa";
-import { MdAlarmAdd, MdAlarmOff } from "react-icons/md";
+// import { MdAlarmAdd, MdAlarmOff } from "react-icons/md";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import * as XLSX from "xlsx";
+// import * as XLSX from "xlsx";
 import { fetchAdminCenterData ,fetchStudentData, fetchUsersByCenter } from "./adminService";
 
 ChartJS.register(
@@ -33,12 +33,12 @@ function Dashboard() {
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
-  const [isClassStarted, setIsClassStarted] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [classStartTime, setClassStartTime] = useState(null);
-  const [classEndTime, setClassEndTime] = useState(null);
-  const [workedTime, setWorkedTime] = useState(null);
-  const [studentCount, setStudentCount] = useState(0);
+  // const [isClassStarted, setIsClassStarted] = useState(false);
+  // const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [classStartTime, setClassStartTime] = useState(null);
+  // const [classEndTime, setClassEndTime] = useState(null);
+  // const [workedTime, setWorkedTime] = useState(null);
+  // const [studentCount, setStudentCount] = useState(0);
   const [adminCenter, setAdminCenter] = useState("");
   const [studentsData, setStudentsData] = useState([]);
   const [thisMonthStudents, setThisMonthStudents] = useState([]);
@@ -85,7 +85,7 @@ function Dashboard() {
       try {
         const data = await fetchStudentData(adminCenter);
         setStudentsData(data);
-        setStudentCount(data.length);
+        // setStudentCount(data.length);
       } catch (error) {
         console.error('Error loading data',error);
       }
@@ -106,9 +106,6 @@ function Dashboard() {
       const loginDate = new Date(student.logintime);
       return loginDate >= firstDayOfMonth && loginDate <= lastDayOfMonth;
     });
-
-    // Group data by day (date) in the current month and remove duplicates by studentId
-    // const groupedData = {};
     const uniqueUsersByDate = {};
 
     filteredUsers.forEach((student) => {
@@ -148,61 +145,61 @@ function Dashboard() {
 }, [selectedMonth, users]);
 
 
-  const handleClassStart = () => {
-    if (!isClassStarted) {
-      setIsClassStarted(true);
-      setClassStartTime(new Date().toLocaleString());
-      toast.success("Class Started!");
-    }
-  };
+  // const handleClassStart = () => {
+  //   if (!isClassStarted) {
+  //     setIsClassStarted(true);
+  //     setClassStartTime(new Date().toLocaleString());
+  //     toast.success("Class Started!");
+  //   }
+  // };
 
-  const handleClassStop = () => setIsDialogOpen(true);
+  // const handleClassStop = () => setIsDialogOpen(true);
 
-  const confirmStopClass = () => {
-    setIsClassStarted(false);
-    setClassEndTime(new Date().toLocaleString());
-    setWorkedTime(Math.floor(Math.random() * 4) + 1);
-    setStudentCount(Math.floor(Math.random() * 30) + 10);
-    toast.success("Class Stopped!");
-    setIsDialogOpen(false);
-    downloadExcel();
-  };
+  // const confirmStopClass = () => {
+  //   setIsClassStarted(false);
+  //   setClassEndTime(new Date().toLocaleString());
+  //   setWorkedTime(Math.floor(Math.random() * 4) + 1);
+  //   setStudentCount(Math.floor(Math.random() * 30) + 10);
+  //   toast.success("Class Stopped!");
+  //   setIsDialogOpen(false);
+  //   downloadExcel();
+  // };
 
-  const cancelStopClass = () => setIsDialogOpen(false);
+  // const cancelStopClass = () => setIsDialogOpen(false);
 
-  const downloadExcel = () => {
-    const workedTimeData = [
-      {
-        "Center Start Time": classStartTime,
-        "Center End Time": classEndTime,
-        "Worked Time (hours)": workedTime,
-        "Student Count": studentCount,
-      },
-    ];
+  // const downloadExcel = () => {
+  //   const workedTimeData = [
+  //     {
+  //       "Center Start Time": classStartTime,
+  //       "Center End Time": classEndTime,
+  //       "Worked Time (hours)": workedTime,
+  //       "Student Count": studentCount,
+  //     },
+  //   ];
 
-    const studentTimesData = Array.from({ length: 5 }, (_, index) => ({
-      "Student ID": `Student${index + 1}`,
-      "Start Time": new Date(
-        new Date().setHours(
-          Math.floor(Math.random() * 12),
-          Math.floor(Math.random() * 60),
-          0
-        )
-      ).toLocaleString(),
-      "Logout Time": new Date(
-        new Date().setHours(
-          Math.floor(Math.random() * 12) + 12,
-          Math.floor(Math.random() * 60),
-          0
-        )
-      ).toLocaleString(),
-    }));
+  //   const studentTimesData = Array.from({ length: 5 }, (_, index) => ({
+  //     "Student ID": `Student${index + 1}`,
+  //     "Start Time": new Date(
+  //       new Date().setHours(
+  //         Math.floor(Math.random() * 12),
+  //         Math.floor(Math.random() * 60),
+  //         0
+  //       )
+  //     ).toLocaleString(),
+  //     "Logout Time": new Date(
+  //       new Date().setHours(
+  //         Math.floor(Math.random() * 12) + 12,
+  //         Math.floor(Math.random() * 60),
+  //         0
+  //       )
+  //     ).toLocaleString(),
+  //   }));
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(workedTimeData), "Center Times & Data");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(studentTimesData), "Student Times");
-    XLSX.writeFile(wb, "class_times.xlsx");
-  };
+  //   const wb = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(workedTimeData), "Center Times & Data");
+  //   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(studentTimesData), "Student Times");
+  //   XLSX.writeFile(wb, "class_times.xlsx");
+  // };
 
   const handleSignOut = () => {
     localStorage.removeItem("admin_token");
@@ -242,7 +239,7 @@ function Dashboard() {
         if (!adminCenter) return; // Ensure adminCenter is available before fetching
         try {
           setLoading(true); // Set loading to true before fetching
-          await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate a small delay
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate a small delay
           const data = await fetchUsersByCenter(adminCenter);
           // Filter users whose logintime is today
           const filteredData = data.filter((student) =>
@@ -360,7 +357,7 @@ function Dashboard() {
 
 
       <div className="absolute top-0 right-4 p-4 flex space-x-4">
-        <div onClick={handleClassStart}>
+        {/* <div onClick={handleClassStart}>
           {isClassStarted ? (
             <MdAlarmOff
               className="text-white text-3xl cursor-pointer"
@@ -369,14 +366,14 @@ function Dashboard() {
           ) : (
             <MdAlarmAdd className="text-white text-3xl cursor-pointer" />
           )}
-        </div>
+        </div> */}
         <FaSignOutAlt
           className="text-white text-3xl cursor-pointer"
           onClick={handleSignOut}
         />
       </div>
 
-      {isDialogOpen && (
+      {/* {isDialogOpen && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-sm w-full">
             <h3 className="text-xl font-semibold text-white mb-4 text-center">Are you Close the Center?</h3>
@@ -386,7 +383,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <ToastContainer />
     </div>

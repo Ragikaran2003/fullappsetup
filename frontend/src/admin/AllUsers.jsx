@@ -54,34 +54,47 @@ function AllUsers() {
     const delayFetch = async () => {
       if (!adminCenter) return;
       try {
+        // Simulate a delay for fetching data
         await new Promise((resolve) => setTimeout(resolve, 2000));
+  
         const data = await fetchStudentData(adminCenter);
-
-        const filteredData = data.filter(
-          (student) => student.studentStatus === "come"
-        );
+  
+        // Filter students who are marked as "come"
+        const filteredData = data.filter((student) => student.studentStatus === "come");
+  
+        // Separate students by project
         const moratuwaStudents = filteredData.filter(
           (student) => student.project === "University of Moratuwa"
         );
         const otherStudents = filteredData.filter(
           (student) => student.project !== "University of Moratuwa"
         );
-        
-        // Assign projects for University of Moratuwa
+  
+        // Sort Moratuwa students by descending certificates
+        moratuwaStudents.sort((a, b) => b.certificates - a.certificates);
+  
+        // Assign descending order for certificates to Moratuwa students
         moratuwaStudents.forEach((student, index) => {
-          student.projectOrder = index + 1; // Assign projects starting from 1
           student.certificateOrder = index + 1; // Certificates order for Moratuwa students
         });
-        
-        // Assign shortened sequence to other universities
+  
+        // Sort other students by projectOrder and homework (both descending)
+        otherStudents.sort((a, b) => {
+          if (b.project - a.project !== 0) {
+            return b.project - a.project; // Sort by project (descending)
+          }
+          return b.homework - a.homework; // Sort by homework (descending) if project is the same
+        });
+  
+        // Assign combined order for other students
         otherStudents.forEach((student, index) => {
-          student.projectOrder = index + 1 + moratuwaStudents.length; // Assign sequence after Moratuwa projects
           student.homeworkOrder = index + 1; // Homework order for other students
         });
-        
-        // Combine and log
+  
+        // Combine Moratuwa students and other students
         const combinedData = [...moratuwaStudents, ...otherStudents];
-        
+  
+        // Set the students data
         setStudentsData(combinedData);
       } catch (error) {
         toast.error("Error loading data", error);
@@ -89,9 +102,12 @@ function AllUsers() {
         setLoading(false);
       }
     };
+  
     delayFetch();
   }, [adminCenter]);
-
+  
+  
+  
   const handleSort = (key) => {
     let direction = "ascending";
     if (
@@ -280,7 +296,7 @@ function AllUsers() {
       </div>
       </div>
 
-      <div className="overflow-auto" style={{ maxHeight: "400px" }}>
+      <div className="overflow-auto" style={{ maxHeight: "450px" }}>
         <table className="min-w-full table-auto bg-white shadow-md rounded-lg">
           <thead className="bg-blue-600 text-white">
             <tr>

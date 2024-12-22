@@ -3,17 +3,21 @@ import { FaDownload, FaSort } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "react-datepicker/dist/react-datepicker.css"; // Import the calendar's CSS
+import DatePicker from "react-datepicker"; // Import DatePicker
 import { fetchAdminCenterData, fetchUsersByCenter } from "./adminService";
 import axios from "axios";
+
 function OnlineStudents() {
-  const [students, setStudents] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [students, setStudents] = useState([]); // This holds the data for download
+  const [users, setUsers] = useState([]); // This holds filtered data for display
+  const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({
     key: "studentid",
     direction: "ascending",
   });
   const [adminCenter, setAdminCenter] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Track the selected date
 
   useEffect(() => {
     const loadAdminData = async () => {
@@ -29,6 +33,7 @@ function OnlineStudents() {
 
   const handleLogoutUser = async (userId) => {
     try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/users/logout/${userId}`
       );
@@ -47,102 +52,120 @@ function OnlineStudents() {
     }
   };
 
-  // Function to check if a date's logintime is today
-  const isSameDay = (dateString) => {
+  const isSameDay = (dateString, dateToCompare) => {
     const logintime = new Date(dateString);
-    const now = new Date();
     return (
-      logintime.getUTCFullYear() === now.getUTCFullYear() &&
-      logintime.getUTCMonth() === now.getUTCMonth() &&
-      logintime.getUTCDate() === now.getUTCDate()
+      logintime.getUTCFullYear() === dateToCompare.getFullYear() &&
+      logintime.getUTCMonth() === dateToCompare.getMonth() &&
+      logintime.getUTCDate() === dateToCompare.getDate()
     );
   };
 
   useEffect(() => {
     const delayFetch = async () => {
-      if (!adminCenter) return; // Ensure adminCenter is available before fetching
+      if (!adminCenter) return;
       try {
-        setLoading(true); // Set loading to true before fetching
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate a small delay
+        setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         const data = await fetchUsersByCenter(adminCenter);
-        // Filter users whose logintime is today
+
+        // Filter users by the selected date
         const filteredData = data.filter((student) =>
-          isSameDay(student.logintime)
+          isSameDay(student.logintime, selectedDate)
         );
+
         const sortedData = filteredData.sort((a, b) => {
-          // Prioritize status: Active comes before inactive
           if (a.status === b.status) {
-            // If statuses are the same, sort by logintime descending
             return new Date(a.logintime) - new Date(b.logintime);
           }
-          return a.status === "active" ? -1 : 1; // Active students come first
+          return a.status === "active" ? -1 : 1;
         });
-        // Store the filtered data in the state
+
         setUsers(sortedData);
+        setStudents(sortedData);  // Ensure students state is set as well
       } catch (error) {
         toast.error("Error loading data", error);
       } finally {
-        setLoading(false); // Always set loading back to false
+        setLoading(false);
       }
     };
 
     delayFetch();
-  }, [adminCenter]);
+  }, [adminCenter, selectedDate]);
 
-  // Function to handle sorting
   const handleSort = (key) => {
     const isSameKey = sortConfig.key === key;
-    const direction = isSameKey && sortConfig.direction === "ascending" ? "descending" : "ascending";
-  
+    const direction =
+      isSameKey && sortConfig.direction === "ascending"
+        ? "descending"
+        : "ascending";
+
     const sortedUsers = [...users].sort((a, b) => {
       let valueA = a[key];
       let valueB = b[key];
-  
+
       if (key === "pcId") {
-        // Extract numeric value from pcId for accurate number comparison
         valueA = parseInt(valueA.slice(2), 10);
         valueB = parseInt(valueB.slice(2), 10);
       } else {
-        // Default string comparison for other columns
         valueA = valueA ? valueA.toString().toLowerCase() : "";
         valueB = valueB ? valueB.toString().toLowerCase() : "";
       }
-  
+
       if (valueA < valueB) return direction === "ascending" ? -1 : 1;
       if (valueA > valueB) return direction === "ascending" ? 1 : -1;
       return 0;
     });
-    setStudents(sortedUsers)
+
+    setStudents(sortedUsers);
     setUsers(sortedUsers);
     setSortConfig({ key, direction });
   };
-  
-  
-  // Function to download the data as an Excel file
+
   const downloadExcel = () => {
+    if (students.length === 0) {
+      toast.warn("No data available to download");
+      return;
+    }
+
     const worksheet = XLSX.utils.json_to_sheet(students);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Online Students");
-
-    // Save the file
     XLSX.writeFile(workbook, "online_students.xlsx");
   };
+
+  // Calculate the unique students based on studentId
+  const uniqueStudents = Array.from(
+    new Map(users.map((student) => [student.studentId, student])).values()
+  );
+  const uniqueCount = uniqueStudents.length;
 
   return (
     <div className="p-4 bg-gray-900 shadow-lg text-white">
       <h2 className="text-3xl font-semibold mb-2">Online Students</h2>
       <p className="mb-2">Here you can list all currently online students.</p>
 
-      <button
-        onClick={downloadExcel}
-        className="bg-blue-600 text-white py-2 px-4 rounded-lg mt-2 mb-2 flex items-center hover:bg-blue-700 transition duration-200"
-      >
-        <FaDownload className="mr-2" /> Download as Excel
-      </button>
+      <div className="flex flex-wrap justify items-center mb-4 gap-4">
+        <div className="ml-auto text-lg font-semibold">
+          Unique Students: {uniqueCount < 10 ? "0"+uniqueCount : uniqueCount}
+        </div>
+        <button
+          onClick={downloadExcel}
+          className="bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center hover:bg-blue-700 transition duration-200"
+        >
+          <FaDownload className="mr-2" /> Download as Excel
+        </button>
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => setSelectedDate(date)}
+          className="bg-gray-800 text-white py-2 px-4 rounded-lg"
+          dateFormat="yyyy-MM-dd"
+        />
+      </div>
 
-      <div className="overflow-auto" style={{ maxHeight: "400px" }}>
+      <div className="overflow-auto" style={{ maxHeight: "470px" }}>
         <table className="min-w-full table-auto bg-white shadow-md rounded-lg">
-          <thead className="bg-blue-600 text-white sticky top-0 z-10">
+          <thead className="bg-blue-600 text-white sticky top-0">
             <tr>
               <th
                 className="p-4 text-left text-sm font-medium cursor-pointer"
@@ -246,7 +269,6 @@ function OnlineStudents() {
         </table>
       </div>
 
-      {/* Toastify Container */}
       <ToastContainer />
     </div>
   );

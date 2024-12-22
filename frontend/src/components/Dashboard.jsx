@@ -1,31 +1,50 @@
 import { useEffect, useState } from "react";
 import { FaUserCircle, FaTimesCircle } from "react-icons/fa"; // Importing React Icons
+import logoTA from "../assets/logo_ta.png";
+import Dp from "../assets/dp.png";
+import Code from "../assets/code.svg";
 
 const Dashboard = ({ token }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
   const [studentDetails, setStudentDetails] = useState([]);
-  const students = [
-    { name: "John Doe", certificateCount: 5, center: "Center A" },
-    { name: "Jane Smith", certificateCount: 3, center: "Center B" },
-    { name: "Alice Johnson", certificateCount: 7, center: "Center A" },
-    { name: "Bob Brown", certificateCount: 4, center: "Center C" },
-    { name: "Charlie Davis", certificateCount: 2, center: "Center B" },
-    { name: "David Wilson", certificateCount: 6, center: "Center A" },
-    { name: "Eve Lee", certificateCount: 1, center: "Center C" },
-    { name: "Frank Miller", certificateCount: 8, center: "Center B" },
-    { name: "Grace Lewis", certificateCount: 9, center: "Center A" },
-    { name: "Hannah Walker", certificateCount: 3, center: "Center C" },
-    { name: "David Wilson", certificateCount: 6, center: "Center A" },
-    { name: "Eve Lee", certificateCount: 1, center: "Center C" },
-    { name: "Frank Miller", certificateCount: 8, center: "Center B" },
-    { name: "Grace Lewis", certificateCount: 9, center: "Center A" },
-    { name: "Hannah Walker", certificateCount: 3, center: "Center C" },
-    { name: "David Wilson", certificateCount: 6, center: "Center A" },
-    { name: "Eve Lee", certificateCount: 1, center: "Center C" },
-    { name: "Frank Miller", certificateCount: 8, center: "Center B" },
-    { name: "Grace Lewis", certificateCount: 9, center: "Center A" },
-    { name: "Hannah Walker", certificateCount: 3, center: "Center C" },
-  ];
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/students/univercity`
+        );
+
+        // Check if the response is successful (status 200)
+        if (!response.ok) {
+          throw new Error("Failed to fetch students");
+        }
+
+        const data = await response.json();
+
+        // Check if the 'students' field exists in the response
+        if (data && data.students) {
+          const sortedStudents = data.students
+            .sort((a, b) => {
+              // Example sorting: sort by the number of certificates or any custom field
+              return b.certificates.length - a.certificates.length; // Sorting by certificate count (desc)
+            })
+            .reverse();
+          setStudents(sortedStudents);
+        } else {
+          console.log("No students found.");
+          setStudents([]); // Optionally set empty array to clear students
+        }
+      } catch (error) {
+        console.error("Error fetching students:", error);
+        setStudents([]); // Optionally handle the error by setting an empty array
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
   useEffect(() => {
     const storedID = localStorage.getItem("id_token"); // Retrieve fullname from localStorage
 
@@ -123,14 +142,14 @@ const Dashboard = ({ token }) => {
                     University Students Name
                   </th>
                   <th className="text-left px-4 py-2">Certificate Count</th>
-                  <th className="text-left px-4 py-2">Certificate Count</th>
+                  <th className="text-left px-4 py-2">Center Name</th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((student, index) => (
                   <tr key={index} className="bg-gray-800 hover:bg-gray-600">
-                    <td className="px-4 py-2">{student.name}</td>
-                    <td className="px-4 py-2">{student.certificateCount}</td>
+                    <td className="px-4 py-2">{student.fullName}</td>
+                    <td className="px-4 py-2">{student.certificates}</td>
                     <td className="px-4 py-2">{student.center}</td>
                   </tr>
                 ))}
@@ -150,25 +169,27 @@ const Dashboard = ({ token }) => {
             href="https://dpedumonitoring.site/"
             target="_blank"
             rel="noopener noreferrer"
+            className="bg-blue-600 hover:bg-blue-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl flex items-center justify-center space-x-4"
           >
-            <button className="bg-blue-600 hover:bg-blue-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl">
-              DP MONITORING SYSTEM
-            </button>
+            <img src={Dp} alt="DP Monitoring Logo" className="w-8 h-8" />
+            <span>DP MONITORING</span>
           </a>
 
           <a
             href="https://www.dpcode.lk/ta"
             target="_blank"
             rel="noopener noreferrer"
+            className="inline-block"
           >
-            <button className="bg-green-600 hover:bg-green-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl">
-              DP CODE
+            <button className="bg-green-600 hover:bg-green-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl flex items-center justify-center space-x-4">
+              <img src={logoTA} alt="DP Code Logo" className="w-18 h-8" />
+              <span>DP CODE</span>
             </button>
           </a>
 
           <a href="https://code.org" target="_blank" rel="noopener noreferrer">
-            <button className="bg-yellow-600 hover:bg-yellow-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl">
-              CODE.ORG
+            <button className="bg-yellow-600 hover:bg-yellow-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl flex items-center justify-center space-x-4">
+              <img src={Code} alt="" className="w-8 h-8"/><span>CODE.ORG</span>
             </button>
           </a>
         </div>
@@ -187,7 +208,7 @@ const Dashboard = ({ token }) => {
             </div>
 
             {/* Profile Information */}
-            <div className="space-y-2 text-white">
+            <div className="space-y-2 text-white h-96 overflow-y-auto">
               {studentDetails ? (
                 <>
                   <p>

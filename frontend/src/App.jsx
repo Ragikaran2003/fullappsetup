@@ -12,6 +12,9 @@ import Sidebar from './admin/Sidebar';
 import DropoutUsers from './admin/DropoutUsers';
 import ErrorPage from './components/ErrorPage';
 import { UsefullLinks } from './admin/UsefullLinks';
+import { StudentsClass } from './admin/StudentsClass';
+import { ClassSummary } from './admin/ClassSummary';
+import { StudentsClassCount } from './admin/StudentsClassCount';
 
 function App() {
   return (
@@ -39,6 +42,9 @@ function App() {
                 <Route path="absencestudents" element={<AbsenceTable />} />
                 <Route path="dropout-users" element={<DropoutUsers />} />
                 <Route path="usefull-links" element={<UsefullLinks />} />
+                <Route path="students-class" element={<StudentsClass />} />
+                <Route path="class-summary" element={<ClassSummary />} />
+                <Route path="students-class-count" element={<StudentsClassCount />} />
               </Routes>
             </div>
           </div>

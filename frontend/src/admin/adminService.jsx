@@ -15,6 +15,19 @@ export const fetchAdminCenterData = async () => {
     throw error;
   }
 };
+
+export const updateStudentClasses = async (studentId, classes) => {
+  try {
+    const response = await axios.put(
+      `${import.meta.env.VITE_API_URL}/students/update-classes/${studentId}`,
+      { classes }
+    );
+    return response.data; // Return the updated student data
+  } catch (error) {
+    throw new Error('Failed to update student classes',error);
+  }
+};
+
 export const fetchStudentData = async (adminCenter) => {
   try {
     const response = await axios.get(

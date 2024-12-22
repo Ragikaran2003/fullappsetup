@@ -205,7 +205,6 @@ const LoginPage = () => {
         break;
     }
   };
-  console.log(idmodel);
 
   // Form submit handler
   const handleSubmit = async (event) => {
@@ -530,7 +529,7 @@ const LoginPage = () => {
               <button
                 onClick={async () => {
                   try {
-                    setIsConfirmationVisible(false); // Close the confirmation modal
+                    await new Promise(resolve => setTimeout(resolve, 1500));
 
                     // Proceed with backend update after confirmation
                     const updateResponse = await fetch(
@@ -557,6 +556,7 @@ const LoginPage = () => {
                       toast.success("Login successful!");
                       setToken(updateResult.token);
                       localStorage.setItem("token", updateResult.token);
+                      setIsConfirmationVisible(false);
                       setTimeout(() => {
                         navigate("/");
                       }, 2000);

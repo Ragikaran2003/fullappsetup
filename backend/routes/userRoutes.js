@@ -1,17 +1,47 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const cron = require('node-cron');  
 const bcrypt = require("bcryptjs");
 const Student = require("../models/Student");
-const User = require("../models/User");
+const User = require("../models/User"); 
 const moment = require("moment-timezone");
 const router = express.Router();
 
+
+
+cron.schedule('* * * * *', async () => {
+  try {
+    // Get the current time in Sri Lankan timezone (Asia/Colombo)
+    const currentTime = moment().tz('Asia/Colombo').format('HH:mm');
+
+    // Check if the current time is 1:22 PM (13:22) in Sri Lankan time
+    if (currentTime === '00:00') {
+
+      // Find all active users and update their status to "inactive"
+      const users = await User.find({ status: 'active' });
+
+      if (users.length > 0) {
+        // Update the status of all active users to inactive
+        for (let user of users) {
+          user.logouttime = new Date();
+          user.status = 'inactive';
+          await user.save();
+        }
+        console.log(`Logged out ${users.length} active users.`);
+      } else {
+        console.log('No active users to log out.');
+      }
+    }
+  } catch (error) {
+    console.error('Error during automatic logout:', error);
+  }
+});
+
 // LOGIN ROUTE
 router.post("/login", async (req, res) => {
-  const { studentId, password, pcId, project, homework,certificates } = req.body;
+  const { studentId, password, pcId, project, homework, certificates } = req.body;
 
   try {
-    console.log("Received request:", req.body);
 
     // Check if the username exists in the database
     const student = await Student.findOne({ studentId });
@@ -20,7 +50,6 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Username not found" });
     }
 
-    console.log("Found student:", student);
 
     // Compare the provided password with hashed password in the database
     const isMatch = await bcrypt.compare(password, student.password);
@@ -29,12 +58,20 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Incorrect password" });
     }
 
-
     // Check if a user session already exists
     const userExists = await User.findOne({ studentId: student.studentId, status: "active" });
 
     if (userExists) {
       return res.status(400).json({ message: "User already logged in" });
+    }
+
+    const pcSessionExists = await User.findOne({ 
+      pcId: pcId, 
+      status: "active"
+    });
+    
+    if (pcSessionExists) {
+      return res.status(400).json({ message: "Another user is already logged in on this PC" });
     }
 
     student.project = project;
@@ -60,8 +97,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: newUser._id, studentId: newUser.studentId },
-      process.env.JWT_SECRET || "secret",
-      { expiresIn: "5d" }
+      process.env.JWT_SECRET || "secret"
     );
 
     return res.status(200).json({
@@ -71,7 +107,6 @@ router.post("/login", async (req, res) => {
         fullname: newUser.fullname,
         studentId: newUser.studentId,
       },
-      
     });
     
   } catch (error) {
@@ -93,10 +128,11 @@ router.post("/logout", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found or already logged out" });
     }
-
-    user.logouttime = new Date();
-    user.status = "inactive";
-    await user.save();
+    if (!(user.status === "inactive" && user.logouttime)) {
+      user.logouttime = new Date();
+      user.status = "inactive";
+      await user.save();
+    }
 
     return res.status(200).json({ message: "Logout successful" });
   } catch (error) {
@@ -104,7 +140,6 @@ router.post("/logout", async (req, res) => {
     return res.status(401).json({ message: "Invalid token or expired session" });
   }
 });
-
 
 router.post("/logout/:id", async (req, res) => {
   try {
@@ -125,7 +160,6 @@ router.post("/logout/:id", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 router.get('/data/online', async (req, res) => {
   try {

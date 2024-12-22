@@ -89,7 +89,7 @@ function DropoutUsers() {
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = studentsData.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);

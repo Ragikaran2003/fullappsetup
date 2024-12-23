@@ -18,7 +18,7 @@ function OnlineStudents() {
   });
   const [adminCenter, setAdminCenter] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date()); // Track the selected date
-
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     const loadAdminData = async () => {
       try {
@@ -60,7 +60,11 @@ function OnlineStudents() {
       logintime.getUTCDate() === dateToCompare.getDate()
     );
   };
-
+  function formatTime(isoString) {
+    if (!isoString) return "";
+    const [hour, minute] = isoString.split("T")[1].split(":"); // Extract hour and minute
+    return `${hour}:${minute}`;
+  }
   useEffect(() => {
     const delayFetch = async () => {
       if (!adminCenter) return;
@@ -82,7 +86,7 @@ function OnlineStudents() {
         });
 
         setUsers(sortedData);
-        setStudents(sortedData);  // Ensure students state is set as well
+        setStudents(sortedData); // Ensure students state is set as well
       } catch (error) {
         toast.error("Error loading data", error);
       } finally {
@@ -140,15 +144,23 @@ function OnlineStudents() {
   );
   const uniqueCount = uniqueStudents.length;
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    const filteredUsers = students.filter((student) =>
+      [student.studentId, student.fullname, student.pcId]
+        .join(" ")
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
+    setUsers(filteredUsers);
+  };
+
   return (
     <div className="p-4 bg-gray-900 shadow-lg text-white">
       <h2 className="text-3xl font-semibold mb-2">Online Students</h2>
       <p className="mb-2">Here you can list all currently online students.</p>
 
       <div className="flex flex-wrap justify items-center mb-4 gap-4">
-        <div className="ml-auto text-lg font-semibold">
-          Unique Students: {uniqueCount < 10 ? "0"+uniqueCount : uniqueCount}
-        </div>
         <button
           onClick={downloadExcel}
           className="bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center hover:bg-blue-700 transition duration-200"
@@ -160,6 +172,16 @@ function OnlineStudents() {
           onChange={(date) => setSelectedDate(date)}
           className="bg-gray-800 text-white py-2 px-4 rounded-lg"
           dateFormat="yyyy-MM-dd"
+        />
+        <div className="ml-auto text-lg font-semibold">
+          Unique Students: {uniqueCount < 10 ? "0" + uniqueCount : uniqueCount}
+        </div>
+      <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Search by Name, ID, or PC ID"
+          className="bg-gray-800 text-white py-2 px-4 rounded-lg w-full sm:w-auto"
         />
       </div>
 
@@ -236,10 +258,12 @@ function OnlineStudents() {
                   <td className="p-4 text-sm">{student.studentId}</td>
                   <td className="p-4 text-sm">{student.fullname}</td>
                   <td className="p-4 text-sm">{student.pcId}</td>
-                  <td className="p-4 text-sm">{student.logintime}</td>
+                  <td className="p-4 text-sm">
+                    {formatTime(student.logintime)}
+                  </td>
                   <td className="p-4 text-sm">
                     {student.status !== "active"
-                      ? student.logouttime
+                      ? formatTime(student.logouttime)
                       : "Still Working"}
                   </td>
                   <td className="p-4 text-sm">

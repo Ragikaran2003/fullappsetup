@@ -6,7 +6,7 @@ const Student = require("../models/Student");
 const User = require("../models/User"); 
 const moment = require("moment-timezone");
 const router = express.Router();
-
+const { getSriLankanTime } = require('../time');
 
 
 cron.schedule('* * * * *', async () => {
@@ -84,7 +84,7 @@ router.post("/login", async (req, res) => {
     const newUser = new User({
       fullname: student.fullName,
       studentId: student.studentId,
-      logintime: new Date(),
+      logintime: new Date(getSriLankanTime()),
       pcId,
       status: "active",
       center: student.center,
@@ -129,7 +129,7 @@ router.post("/logout", async (req, res) => {
       return res.status(404).json({ message: "User not found or already logged out" });
     }
     if (!(user.status === "inactive" && user.logouttime)) {
-      user.logouttime = new Date();
+      user.logouttime = new Date(getSriLankanTime());
       user.status = "inactive";
       await user.save();
     }
@@ -150,7 +150,7 @@ router.post("/logout/:id", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.logouttime = new Date(); // Set current timestamp as logout time
+    user.logouttime = new Date(getSriLankanTime()); // Set current timestamp as logout time
     user.status = "inactive"; // Change status to inactive
     await user.save();
 

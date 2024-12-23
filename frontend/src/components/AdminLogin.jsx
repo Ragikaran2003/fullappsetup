@@ -38,7 +38,7 @@ const AdminLogin = () => {
         setTimeout(() => {
           localStorage.setItem('admin_token', result.id);
           navigate('/staff-dashboard/center-manager');
-        }, 2000); // 2-second delay
+        }, 1000); // 1-second delay
       } else {
         toast.error(result.error || 'Login failed.');
       }

@@ -180,38 +180,39 @@ function DropoutUsers() {
       <ToastContainer />
       <h2 className="text-3xl font-semibold mb-2">Dropout Users</h2>
       <p className="mb-2">Here you can list all dropout users.</p>
+      <div className="flex justify-between">
+        <button
+          onClick={downloadExcel}
+          className="bg-blue-600 text-white py-2 px-4 rounded-lg mt-2 mb-2 flex items-center hover:bg-blue-700 transition duration-200"
+        >
+          <FaDownload className="mr-2" /> Download as Excel
+        </button>
+        <div className="grid grid-cols-2 gap-4 w-2/5">
+          <div className="mb-4">
+            <select
+              value={searchColumn}
+              onChange={(e) => setSearchColumn(e.target.value)}
+              className="w-full p-2 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="fullName">Search by Name</option>
+              <option value="studentId">Search by Student ID</option>
+              <option value="phoneNumber">Search by Phone Number</option>
+              <option value="parentNumber">Search by Parent Number</option>
+            </select>
+          </div>
 
-      <div className="grid grid-cols-2 gap-4 w-2/5">
-        <div className="mb-4">
-          <select
-            value={searchColumn}
-            onChange={(e) => setSearchColumn(e.target.value)}
-            className="w-full p-2 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="fullName">Search by Name</option>
-            <option value="studentId">Search by Student ID</option>
-            <option value="phoneNumber">Search by Phone Number</option>
-            <option value="parentNumber">Search by Parent Number</option>
-          </select>
-        </div>
-
-        {/* Search Input Section */}
-        <div className="mb-4">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Type your search..."
-            className="w-full p-2 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          {/* Search Input Section */}
+          <div className="mb-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Type your search..."
+              className="w-full p-2 rounded-lg bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
       </div>
-      <button
-        onClick={downloadExcel}
-        className="bg-blue-600 text-white py-2 px-4 rounded-lg mt-2 mb-2 flex items-center hover:bg-blue-700 transition duration-200"
-      >
-        <FaDownload className="mr-2" /> Download as Excel
-      </button>
 
       <div className="overflow-auto" style={{ maxHeight: "400px" }}>
         <table className="min-w-full table-auto bg-white shadow-md rounded-lg">
@@ -377,7 +378,6 @@ function DropoutUsers() {
           Last
         </button>
       </div>
-
 
       {isDialogOpen1 && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">

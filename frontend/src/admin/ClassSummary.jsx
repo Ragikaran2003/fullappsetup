@@ -7,7 +7,7 @@ export const ClassSummary = () => {
   const [loading, setLoading] = useState(false);
   const [classSummary, setClassSummary] = useState({});
   const [adminCenter, setAdminCenter] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState(null); // State for modal
+  const [selectedSlot, setSelectedSlot] = useState(null); 
 
   const timeSlots = [
     "6.30 am - 8.30 am",
@@ -35,7 +35,6 @@ export const ClassSummary = () => {
       try {
         const adminData = await fetchAdminCenterData();
         setAdminCenter(adminData.center);
-        console.log("Admin center loaded:", adminData.center);
       } catch (error) {
         console.error("Failed to load admin center data:", error);
         toast.error("Failed to load admin center data.");
@@ -51,9 +50,7 @@ export const ClassSummary = () => {
 
       try {
         setLoading(true);
-        console.log("Fetching student data for center:", adminCenter);
         const data = await fetchStudentData(adminCenter);
-        console.log("Student data fetched:", data);
         setStudentsData(data);
         processClassSummary(data);
         setLoading(false);

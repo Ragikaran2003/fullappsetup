@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler 
 } from "chart.js";
 import { FaSignOutAlt } from "react-icons/fa";
 // import { MdAlarmAdd, MdAlarmOff } from "react-icons/md";
@@ -24,7 +25,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 function Dashboard() {
@@ -268,10 +270,7 @@ function Dashboard() {
   
       delayFetch();
     }, [adminCenter]);
-  // Log the users array whenever it changes
-  useEffect(() => {
-    console.log("Filtered :", users);
-  }, [users]);
+  
 
   return (
     <div className="p-4 bg-gray-900 text-white relative">
@@ -311,7 +310,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-3">
-        <h3 className="text-2xl font-semibold mb-3">Daily Student Growth</h3>
+        <h3 className="text-2xl font-semibold mb-3">Monthly Students Growth</h3>
         <div className="bg-gray-800 p-6 rounded-lg shadow-md flex items-center justify-center" style={{ maxHeight: "50vh", height: "400px" }}>
           {loading ? (
             <div className="flex flex-col items-center">
@@ -339,7 +338,7 @@ function Dashboard() {
                   legend: { labels: { color: "#ffffff" } },
                   tooltip: {
                     callbacks: {
-                      label: ({ label, raw }) => `Day ${label}: ${raw} new students`,
+                      label: ({ label, raw }) => `Day ${label}: ${raw} students`,
                     },
                   },
                 },
@@ -367,7 +366,7 @@ function Dashboard() {
             <MdAlarmAdd className="text-white text-3xl cursor-pointer" />
           )}
         </div> */}
-        <FaSignOutAlt
+        <FaSignOutAlt aria-label="logout"
           className="text-white text-3xl cursor-pointer"
           onClick={handleSignOut}
         />

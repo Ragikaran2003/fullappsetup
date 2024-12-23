@@ -9,7 +9,7 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaClipboard,
-  FaChartBar,
+  // FaChartBar,
 } from 'react-icons/fa'; // Example icons
 import logo from '../assets/logo.png';
 // import { HiOutlineBars3 } from "react-icons/hi2"; // Hamburger icon
@@ -131,7 +131,7 @@ function Sidebar() {
             {!isCollapsed && 'Usefull Links'}
           </NavLink>
         </li>
-        <li>
+        {/* <li>
           <NavLink
             to="/staff-dashboard/students-class-count"
             className={({ isActive }) =>
@@ -143,7 +143,7 @@ function Sidebar() {
             <FaChartBar className="w-6 h-6 mr-2" />
             {!isCollapsed && 'Students Class Count'}
           </NavLink>
-        </li>
+        </li> */}
         {/* Pro Menu with Submenu */}
         <li>
           <button

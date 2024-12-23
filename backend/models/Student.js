@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const moment = require("moment-timezone");
 require('dotenv').config();
+const { getSriLankanTime } = require('../time');  // Import your custom time function
 
 // Access the default timezone from .env
-const timezone = process.env.DEFAULT_TIMEZONE || 'Asia/Colombo'; 
 
 const studentSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
@@ -22,7 +21,15 @@ const studentSchema = new mongoose.Schema({
   certificates: { type: String, default: null },
   classes: { type: [String], default: [] },
   studentStatus: { type: String, default: "come" },
-  createdAt: { type: Date, default: () => moment().tz(timezone).toDate() },
+  
+  // Use the getSriLankanTime function to set the createdAt field
+  createdAt: { 
+    type: Date, 
+    default: () => {
+      const sriLankanTime = getSriLankanTime();
+      return new Date(sriLankanTime);  // Convert the time string to a Date object
+    }
+  },
 });
- 
+
 module.exports = mongoose.model("Student", studentSchema);

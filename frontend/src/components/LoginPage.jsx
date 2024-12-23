@@ -333,7 +333,7 @@ const LoginPage = () => {
                     htmlFor="studentId"
                     className="block text-sm font-medium text-gray-300"
                   >
-                    studentId
+                    Student ID
                   </label>
                   <input
                     type="text"
@@ -493,7 +493,7 @@ const LoginPage = () => {
                   </button>
                 </div>
                 <p className="text-sm mt-4 text-center">
-                  Dont have an account?{" "}
+                  Don`t have an account?{" "}
                   <Link
                     to="/register"
                     className="text-indigo-400 hover:text-indigo-500"

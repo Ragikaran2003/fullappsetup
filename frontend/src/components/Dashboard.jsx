@@ -189,7 +189,8 @@ const Dashboard = ({ token }) => {
 
           <a href="https://code.org" target="_blank" rel="noopener noreferrer">
             <button className="bg-yellow-600 hover:bg-yellow-700 w-96 mr-20 sm:mr-0 text-white py-7 px-5 rounded-md text-2xl flex items-center justify-center space-x-4">
-              <img src={Code} alt="" className="w-8 h-8"/><span>CODE.ORG</span>
+              <img src={Code} alt="" className="w-8 h-8" />
+              <span>CODE.ORG</span>
             </button>
           </a>
         </div>
@@ -199,6 +200,13 @@ const Dashboard = ({ token }) => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-96">
+            {/* Circle Avatar */}
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+                {studentDetails?.fullName.charAt(0).toUpperCase() || "A"}
+              </div>
+            </div>
+
             {/* Modal Header */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Profile Details</h2>

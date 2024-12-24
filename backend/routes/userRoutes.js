@@ -15,7 +15,7 @@ cron.schedule('* * * * *', async () => {
     const currentTime = moment().tz('Asia/Colombo').format('HH:mm');
 
     // Check if the current time is 1:22 PM (13:22) in Sri Lankan time
-    if (currentTime === '00:00') {
+    if (currentTime === '23:59') {
 
       // Find all active users and update their status to "inactive"
       const users = await User.find({ status: 'active' });
@@ -23,7 +23,7 @@ cron.schedule('* * * * *', async () => {
       if (users.length > 0) {
         // Update the status of all active users to inactive
         for (let user of users) {
-          user.logouttime = new Date();
+          user.logouttime = new Date(getSriLankanTime());
           user.status = 'inactive';
           await user.save();
         }
